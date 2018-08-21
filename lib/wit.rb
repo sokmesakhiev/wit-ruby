@@ -62,8 +62,17 @@ class Wit
     req(logger, @access_token, Net::HTTP::Get, "/entities")
   end
 
+  #implement for ruby 1.9.3 that don't have to_h build in function
+  def to_h payload
+    tmp = {}
+    payload.each do |k,v|
+      tmp[k.to_sym] = v
+    end
+    return tmp
+  end
+
   def post_entities(payload)
-    payload = payload.map {|k, v| [(k.to_sym rescue k), v]}.to_h.reject{ |k| ![:id, :doc, :values, :lookups].include?(k) }
+    payload = to_h(payload).reject{ |k| ![:id, :doc, :values, :lookups].include?(k) }
     validate_payload payload
     req(logger, @access_token, Net::HTTP::Post, "/entities", {}, payload)
   end
@@ -73,7 +82,7 @@ class Wit
   end
 
   def put_entities(entity_id, payload)
-    payload = payload.map {|k, v| [(k.to_sym rescue k), v]}.to_h.reject{ |k| ![:id, :doc, :values].include?(k) }
+    payload = to_h(payload).reject{ |k| ![:id, :doc, :values].include?(k) }
     validate_payload payload
     req(logger, @access_token, Net::HTTP::Put, "/entities/#{URI.encode(entity_id)}", {}, payload)
   end
@@ -83,7 +92,7 @@ class Wit
   end
 
   def post_values(entity_id, payload)
-    payload = payload.map {|k, v| [(k.to_sym rescue k), v]}.to_h.reject{ |k| ![:value, :expressions, :metadata].include?(k) }
+    payload = to_h(payload).reject{ |k| ![:value, :expressions, :metadata].include?(k) }
     validate_payload payload
     req(logger, @access_token, Net::HTTP::Post, "/entities/#{URI.encode(entity_id)}/values", {}, payload)
   end
@@ -93,7 +102,7 @@ class Wit
   end
 
   def post_expressions(entity_id, value, payload)
-    payload = payload.map {|k, v| [(k.to_sym rescue k), v]}.to_h.reject{ |k| ![:expression].include?(k) }
+    payload = to_h(payload).reject{ |k| ![:expression].include?(k) }
     validate_payload payload
     req(logger,@access_token, Net::HTTP::Post, "/entities/#{URI.encode(entity_id)}/values/#{URI.encode(value)}/expressions", {}, payload)
   end

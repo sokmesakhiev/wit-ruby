@@ -135,7 +135,7 @@ class Wit
 
     logger.debug("#{meth_class} #{uri}")
 
-    request = meth_class.new(uri)
+    request = meth_class.new(uri.request_uri)
     request['authorization'] = 'Bearer ' + access_token
     request['accept'] = 'application/vnd.wit.' + WIT_API_VERSION + '+json'
     request.add_field 'Content-Type', 'application/json'
